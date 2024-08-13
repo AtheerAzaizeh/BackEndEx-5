@@ -89,6 +89,25 @@ app.put('/cars', async (req, res) => {
     }
 });
 
+// Delete a car by ID from the request body
+app.delete('/cars', async (req, res) => {
+    const { id } = req.body;
+    if (!id) {
+        return res.status(400).json({ error: 'ID is required' });
+    }
+
+    try {
+        const [result] = await pool.query('DELETE FROM tbl_20_car WHERE id = ?', [id]);
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ error: 'Car not found' });
+        }
+
+        res.json({ message: 'Car deleted successfully' });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
 
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
