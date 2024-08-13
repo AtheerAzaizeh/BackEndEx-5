@@ -48,6 +48,26 @@ app.post('/cars/get', async (req, res) => {
     }
 });
 
+// Create a new car
+app.post('/cars', async (req, res) => {
+    const { name, type, color, feedback } = req.body;
+    if (!name || !type || !color) {
+        return res.status(400).json({ error: 'Name, type, and color are required' });
+    }
+
+    try {
+        const [result] = await pool.query(
+            'INSERT INTO tbl_20_car (name, type, color, feedback) VALUES (?, ?, ?, ?)',
+            [name, type, color, feedback]
+        );
+        res.status(201).json({ id: result.insertId, name, type, color, feedback });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+
+
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
 });
