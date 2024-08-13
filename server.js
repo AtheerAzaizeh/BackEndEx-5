@@ -66,6 +66,28 @@ app.post('/cars', async (req, res) => {
     }
 });
 
+// Update a car by ID from the request body
+app.put('/cars', async (req, res) => {
+    const { id, name, type, color, feedback } = req.body;
+    if (!id || !name || !type || !color) {
+        return res.status(400).json({ error: 'ID, name, type, and color are required' });
+    }
+
+    try {
+        const [result] = await pool.query(
+            'UPDATE tbl_20_car SET name = ?, type = ?, color = ?, feedback = ? WHERE id = ?',
+            [name, type, color, feedback, id]
+        );
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ error: 'Car not found' });
+        }
+
+        res.json({ message: 'Car updated successfully' });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
 
 
 app.listen(port, () => {
