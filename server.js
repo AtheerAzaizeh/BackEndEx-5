@@ -30,7 +30,23 @@ app.get('/cars', async (req, res) => {
     }
 });
 
+// Read a single car by ID from the request body
+app.post('/cars/get', async (req, res) => {
+    const { id } = req.body;
+    if (!id) {
+        return res.status(400).json({ error: 'ID is required' });
+    }
 
+    try {
+        const [car] = await pool.query('SELECT * FROM tbl_20_car WHERE id = ?', [id]);
+        if (car.length === 0) {
+            return res.status(404).json({ error: 'Car not found' });
+        }
+        res.json(car[0]);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
 
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
